@@ -128,6 +128,12 @@ check(down.input(0) is g, "downstream reconnected to the Grade")
 after = mp.exact_avg(g, box, 1, RGBA)
 check(all(abs(after[k] - T[k]) < 1e-6 for k in range(3)), "after Make Grade source avg == target %s" % after[:3])
 
+nd = mp.create_lch_node(0)
+for light_, want_ in ((1.0, 0.0), (2 ** (1 / 3.0), 1.0), (0.5, 3 * math.log(0.5, 2))):
+    nd["lightness"].setValue(light_)
+    check(abs(nd["exposure_stops"].value() - want_) < 1e-6,
+          "LCh node exposure readout: lightness %.4f = %+.3f stops" % (light_, nd["exposure_stops"].value()))
+
 print("\n== target persistence ==")
 tgt = {"node": "Read1", "box": box, "frame": 1, "layer": "rgba", "avg": ea}
 mp.save_target(tgt)

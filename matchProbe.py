@@ -430,7 +430,9 @@ def create_lch_node(ws=0):
     k.setTooltip("Multiplies OKLab lightness (= exposure of lightness^3); hue and "
                  "saturation stay put.")
     g.addKnob(k)
-    k = K.Text_Knob("stops", "", "")
+    k = K.Double_Knob("exposure_stops", "= exposure (stops)")
+    k.setRange(-2, 2)
+    k.setTooltip("Read-only: the lightness multiply expressed as an exposure change.")
     g.addKnob(k)
     k = K.Double_Knob("mix", "mix")
     g.addKnob(k)
@@ -438,7 +440,8 @@ def create_lch_node(ws=0):
     g["saturation"].setValue(1.0)
     g["lightness"].setValue(1.0)
     g["mix"].setValue(1.0)
-    g["stops"].setValue("lightness as exposure: [format %+.3f [expr 3*log([value lightness])/log(2)]] stops")
+    g["exposure_stops"].setExpression("lightness > 0 ? 3*log(lightness)/log(2) : 0")
+    g["exposure_stops"].setFlag(getattr(K, "READ_ONLY", K.DISABLED))
     g["tile_color"].setValue(0x3E6FA8FF)
     inv_lms = [cm._inv(m) for m in cm.WS_TO_LMS]
     with g:
@@ -912,7 +915,13 @@ if QtWidgets is not None:
                     for c in range(4):
                         e = QtWidgets.QLineEdit()
                         e.setReadOnly(True)
-                        e.setMinimumWidth(130)
+                        # size from the font: widest possible text + frame padding
+                        sample = ("-0.00000000  (-100.0%)" if which == "\u0394"
+                                  else "-0.00000000")
+                        fm = e.fontMetrics()
+                        tw = (fm.horizontalAdvance(sample) if hasattr(fm, "horizontalAdvance")
+                              else fm.width(sample))
+                        e.setMinimumWidth(max(110, tw + 16))
                         grid.addWidget(e, r, 1 + c)
                         self.fields[(name, which, c)] = e
                         widgets.append(e)
@@ -1322,7 +1331,9 @@ if QtWidgets is not None:
                             if single:
                                 one = compare(single, single, self.ws, self._scale())[name][0]
                                 txt = _fmt(one[c], dec)
-                        self.fields[(name, which, c)].setText(txt)
+                        fld = self.fields[(name, which, c)]
+                        fld.setText(txt)
+                        fld.setCursorPosition(0)   # long values: keep the sign visible
             trace("draw scopes")
             self._draw_scopes(tavg, savg, src)
             trace("draw done")
