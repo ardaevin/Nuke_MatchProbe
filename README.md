@@ -1,5 +1,7 @@
 # Match Probe for Nuke
 
+![Match Probe panel with the MatchProbe_LCh node it creates](docs/matchprobe.png)
+
 A Pixel-Analyzer-style panel for **comparing two image regions**. Lock one area as the **target**, sample another area as the **source**, and read exactly how far apart they are in RGB, HSV and perceptual (OKLab) terms. Then insert a node that matches them.
 
 Useful for matching CG to plate, shot-to-shot continuity, patches and cleanups, and checking a grade.
