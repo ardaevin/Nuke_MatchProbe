@@ -11,9 +11,9 @@ Tested with Nuke / NukeX **14.1** and **17.0** on Windows. It's pure Python plus
 ## Features
 
 - **Target / source average swatches**, drawn through your viewer's own OCIO display transform (e.g. `sRGB (ACES)`), like the Pixel Analyzer's.
-- **Sampling** follows the Pixel Analyzer: Ctrl+Shift+drag a region in the Viewer, from the *Active Viewer* or a named one, on the *current layer* or any other layer.
+- **Sampling** follows the Pixel Analyzer: Ctrl+Shift+drag a region in the Active Viewer; Match Probe reads its rgba.
 - **Value rows**, each showing target / source / Δ (absolute and %). Every section can be folded away with its disclosure triangle.
-  - **rgba**: working-space values. Range is native floating point, or 8/10/16-bit.
+  - **rgba**: working-space values, native floating point.
   - **hsvl**: identical to Nuke's Pixel Analyzer. HSV hue in degrees, `s = (max-min)/max`, `v = max`, `l = 0.2125 R + 0.7154 G + 0.0721 B`.
   - **oklch**: perceptual lightness, chroma, hue and saturation (OKLab, chroma / lightness).
 - **Two vectorscopes** (Rec.709 Cb/Cr, through the viewer transform). Each shows a dot cloud of its region's pixels, its own average as a crosshair, the other region's average as a dashed ring, a skin-tone line and auto zoom.
