@@ -115,6 +115,7 @@ RANGES = [("native floating point", 1.0), ("8-bit", 255.0), ("10-bit", 1023.0),
 # Probe only pulls pixels once box, node, frame, layer and knobs have been
 # unchanged for SETTLE_SECONDS - by then the viewer is normally done.
 SETTLE_SECONDS = 2.0
+SHOW_SAMPLE_OPTIONS = False   # viewer / layer / range dropdowns
 LIVE_GRID = 64           # full sampling up to 64x64 px, strided above
 SUFFIX_ORDER = ("red", "green", "blue", "alpha", "r", "g", "b", "a", "x", "y", "z", "w", "u", "v")
 
@@ -880,7 +881,12 @@ if QtWidgets is not None:
             self.cmb_range.currentTextChanged.connect(self._range_changed)
             form.addWidget(self.cmb_range, 1, 1)
             form.setColumnStretch(3, 1)
-            L.addLayout(form)
+            # Always: Active Viewer, rgba, native floating point. The row is kept
+            # (hidden) so it can be brought back by setting SHOW_SAMPLE_OPTIONS.
+            self.sample_row = QtWidgets.QWidget()
+            self.sample_row.setLayout(form)
+            self.sample_row.setVisible(SHOW_SAMPLE_OPTIONS)
+            L.addWidget(self.sample_row)
 
             grid = QtWidgets.QGridLayout()
             grid.setHorizontalSpacing(4)
@@ -992,6 +998,8 @@ if QtWidgets is not None:
                 self.cmb_viewer.blockSignals(False)
 
         def _refresh_layers(self, node, vn):
+            if not SHOW_SAMPLE_OPTIONS:
+                return
             cur_name = "current layer (%s)" % viewer_layer(vn)
             items = [cur_name] + layers_of(node)
             have = [self.cmb_layer.itemText(i) for i in range(self.cmb_layer.count())]
@@ -1007,6 +1015,8 @@ if QtWidgets is not None:
                 self.cmb_layer.blockSignals(False)
 
         def _layer(self, vn):
+            if not SHOW_SAMPLE_OPTIONS:
+                return "rgba"
             t = self.cmb_layer.currentText()
             return viewer_layer(vn) if (not t or t.startswith("current layer")) else t
 
@@ -1035,10 +1045,14 @@ if QtWidgets is not None:
             self._redraw()
 
         def _scale(self):
+            if not SHOW_SAMPLE_OPTIONS:
+                return 1.0      # native floating point
             return dict(RANGES).get(self.cmb_range.currentText(), 1.0)
 
         # ---- actions ------------------------------------------------------
         def _region(self):
+            if not SHOW_SAMPLE_OPTIONS:
+                return viewer_region(None)      # Active Viewer
             name = self.cmb_viewer.currentText()
             return viewer_region(None if name in ("", "Active Viewer") else name)
 
